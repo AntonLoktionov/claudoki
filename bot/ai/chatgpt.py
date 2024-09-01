@@ -5,6 +5,7 @@ from typing import Optional
 from openai import AsyncAzureOpenAI, AsyncOpenAI
 import tiktoken
 from bot.config import config
+from anthropic import AsyncAnthropic
 
 if config.openai.azure:
     openai = AsyncAzureOpenAI(
@@ -14,7 +15,11 @@ if config.openai.azure:
         azure_deployment=config.openai.azure["deployment"],
     )
 else:
-    openai = AsyncOpenAI(api_key=config.openai.api_key)
+    # openai = AsyncOpenAI(api_key=config.openai.api_key)
+    client = AsyncAnthropic(
+    # This is the default and can be omitted
+        api_key=config.openai.api_key,
+    )
 
 encoding = tiktoken.get_encoding("cl100k_base")
 logger = logging.getLogger(__name__)
@@ -31,6 +36,7 @@ MODELS = {
     "gpt-3.5-turbo-1106": 16385,
     "gpt-3.5-turbo": 4096,
     "gpt-3.5-turbo-16k": 16385,
+    "claude-3-5-sonnet-20240620": 4000 
 }
 
 
@@ -55,17 +61,24 @@ class Model:
             params,
             messages,
         )
-        resp = await openai.chat.completions.create(
-            model=model,
-            messages=messages,
-            **params,
-        )
-        logger.debug(
-            "< chat response: prompt_tokens=%s, completion_tokens=%s, total_tokens=%s",
-            resp.usage.prompt_tokens,
-            resp.usage.completion_tokens,
-            resp.usage.total_tokens,
-        )
+        # resp = await openai.chat.completions.create(
+        #     model=model,
+        #     messages=messages,
+        #     **params,
+        # )
+        resp = await client.messages.create(
+        # max_tokens=1024,
+        messages=messages,
+        model=model,
+        system=prompt or config.openai.prompt,
+        **params,
+    )
+        # logger.debug(
+        #     "< chat response: prompt_tokens=%s, completion_tokens=%s, total_tokens=%s",
+        #     resp.usage.prompt_tokens,
+        #     resp.usage.completion_tokens,
+        #     resp.usage.total_tokens,
+        # )
         answer = self._prepare_answer(resp)
         return answer
 
@@ -73,7 +86,8 @@ class Model:
         self, prompt: str, question: str, history: list[tuple[str, str]]
     ) -> list[dict]:
         """Builds message history to provide context for the language model."""
-        messages = [{"role": "system", "content": prompt or config.openai.prompt}]
+        # messages = [{"role": "system", "content": prompt or config.openai.prompt}]
+        messages = []
         for prev_question, prev_answer in history:
             messages.append({"role": "user", "content": prev_question})
             messages.append({"role": "assistant", "content": prev_answer})
@@ -82,10 +96,11 @@ class Model:
 
     def _prepare_answer(self, resp) -> str:
         """Post-processes an answer from the language model."""
-        if len(resp.choices) == 0:
+        if len(resp.content) == 0:
             raise ValueError("received an empty answer")
 
-        answer = resp.choices[0].message.content
+        # answer = resp.choices[0].message.content
+        answer = resp.content[0].text
         answer = answer.strip()
         return answer
 

@@ -26,9 +26,9 @@ class OpenAI:
     default_model = "gpt-4o-mini"
     default_prompt = "You are an AI assistant."
     default_params = {
-        "temperature": 0.7,
-        "presence_penalty": 0,
-        "frequency_penalty": 0,
+        # "temperature": 0.7,
+        # "presence_penalty": 0,
+        # "frequency_penalty": 0,
         "max_tokens": 1000,
     }
 
