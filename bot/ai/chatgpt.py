@@ -36,7 +36,10 @@ MODELS = {
     "gpt-3.5-turbo-1106": 16385,
     "gpt-3.5-turbo": 4096,
     "gpt-3.5-turbo-16k": 16385,
-    "claude-3-5-sonnet-20240620": 4000 
+    "claude-3-5-sonnet-20240620": 200000,
+    "claude-3-5-sonnet-20241022": 200000,
+    "claude-3-opus-20240229": 200000, # most expensive
+    "claude-3-haiku-20240307": 200000, # cheapest
 }
 
 
