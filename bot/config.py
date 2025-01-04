@@ -29,7 +29,7 @@ class OpenAI:
         # "temperature": 0.7,
         # "presence_penalty": 0,
         # "frequency_penalty": 0,
-        "max_tokens": 1000,
+        "max_tokens": 8000,
     }
 
     def __init__(
