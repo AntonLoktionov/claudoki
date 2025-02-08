@@ -70,12 +70,12 @@ class Model:
         #     **params,
         # )
         resp = await client.messages.create(
-        # max_tokens=1024,
-        messages=messages,
-        model=model,
-        system=prompt or config.openai.prompt,
-        **params,
-    )
+            max_tokens=8000,
+            messages=messages,
+            model=model,
+            # system=prompt or config.openai.prompt,
+            # **params,
+        )
         # logger.debug(
         #     "< chat response: prompt_tokens=%s, completion_tokens=%s, total_tokens=%s",
         #     resp.usage.prompt_tokens,
